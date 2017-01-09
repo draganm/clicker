@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/draganm/bouncer"
 	"github.com/draganm/clicker/comm"
@@ -12,7 +13,7 @@ import (
 )
 
 func Proxy(bnd, remote, clickerServer string) error {
-	c, err := net.Dial("udp", remote)
+	c, err := net.Dial("udp", clickerServer)
 	if err != nil {
 		return err
 	}
@@ -21,6 +22,7 @@ func Proxy(bnd, remote, clickerServer string) error {
 		id := uuid.NewV4()
 		evt := comm.Event{
 			Type:         "request",
+			Time:         time.Now(),
 			UUID:         id.String(),
 			Header:       r.Header,
 			Method:       r.Method,

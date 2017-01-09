@@ -3,6 +3,7 @@ package comm_test
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/draganm/clicker/comm"
 	"github.com/stretchr/testify/assert"
@@ -10,6 +11,7 @@ import (
 
 func TestRequestEncodeDecode(t *testing.T) {
 	req := comm.Event{
+		Time:         time.Now(),
 		Type:         "request",
 		UUID:         "1234",
 		Method:       "GET",
