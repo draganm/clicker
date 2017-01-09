@@ -89,44 +89,55 @@ var _ = BeforeSuite(func(done Done) {
 }, 3.0)
 
 var _ = Describe("Logging", func() {
-	Context("When I start logging", func() {
+
+	Context("When a GET request passes the clicker proxy", func() {
+		var response *http.Response
+		BeforeEach(func() {
+			var err error
+			response, err = http.Get("http://localhost:8080/test1")
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+
 		var s <-chan topic.Event
 		var c chan interface{}
 
 		BeforeEach(func() {
-			s, c = t.Subscribe(t.LastID())
+			log.Println(t.LastID())
+			s, c = t.Subscribe(t.LastID() - 1)
 		})
 
 		AfterEach(func() {
 			close(c)
 		})
 
-		Context("When a GET request passes the clicker proxy", func() {
-			var response *http.Response
-			BeforeEach(func() {
-				var err error
-				response, err = http.Get("http://localhost:8080/test1")
-				Expect(err).ShouldNot(HaveOccurred())
-			})
+		It("should receive 200 response code", func() {
+			Expect(response.StatusCode).To(Equal(200))
+		})
 
-			It("should receive 200 response code", func() {
-				Expect(response.StatusCode).To(Equal(200))
-			})
+		It("Should log request and response events", func(done Done) {
 
-			It("Should log request event", func(done Done) {
+			{
 				d := <-s
 				evt, err := comm.Decode(d.Data)
 				Expect(err).ToNot(HaveOccurred())
-
 				Expect(evt.Method).To(Equal("GET"))
 				Expect(evt.RequestURI).To(Equal("/test1"))
 				Expect(evt.Time).ToNot(Equal(time.Time{}))
 				Expect(evt.UUID).ToNot(BeEmpty())
 				Expect(evt.Header).To(HaveKey("User-Agent"))
 				Expect(evt.Type).To(Equal("request"))
-				close(done)
-			})
+			}
+			{
+				d := <-s
+				evt, err := comm.Decode(d.Data)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(evt.Time).ToNot(Equal(time.Time{}))
+				Expect(evt.UUID).ToNot(BeEmpty())
+				Expect(evt.Header).To(HaveKey("Content-Type"))
+				Expect(evt.Type).To(Equal("response"))
+			}
 
+			close(done)
 		})
 
 	})
