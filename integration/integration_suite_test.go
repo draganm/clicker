@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/draganm/clicker/comm"
@@ -90,6 +91,52 @@ var _ = BeforeSuite(func(done Done) {
 
 var _ = Describe("Logging", func() {
 
+	Context("When a POST request passes the clicker proxy", func() {
+		var response *http.Response
+		BeforeEach(func() {
+			var err error
+			request, err := http.NewRequest("POST", "http://localhost:8080/test1", strings.NewReader("testRequest"))
+			Expect(err).ShouldNot(HaveOccurred())
+			response, err = http.DefaultClient.Do(request)
+			Expect(err).ShouldNot(HaveOccurred())
+		})
+
+		var s <-chan topic.Event
+		var c chan interface{}
+
+		BeforeEach(func() {
+			s, c = t.Subscribe(t.LastID())
+		})
+
+		AfterEach(func() {
+			close(c)
+		})
+
+		It("should receive 200 response code", func() {
+			Expect(response.StatusCode).To(Equal(200))
+		})
+
+		It("Should log event", func(done Done) {
+
+			{
+				d := <-s
+				evt, err := comm.Decode(d.Data)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(evt.Method).To(Equal("POST"))
+				Expect(evt.RequestURI).To(Equal("/test1"))
+				Expect(evt.Time).ToNot(Equal(time.Time{}))
+				Expect(evt.UUID).ToNot(BeEmpty())
+				Expect(evt.RequestHeader).To(HaveKey("User-Agent"))
+				Expect(evt.ResponseHeader).To(HaveKey("Content-Type"))
+				Expect(string(evt.CapturedResponseBody)).To(Equal("test"))
+				Expect(string(evt.CapturedRequestBody)).To(Equal("testRequest"))
+			}
+
+			close(done)
+		})
+
+	})
+
 	Context("When a GET request passes the clicker proxy", func() {
 		var response *http.Response
 		BeforeEach(func() {
@@ -102,8 +149,7 @@ var _ = Describe("Logging", func() {
 		var c chan interface{}
 
 		BeforeEach(func() {
-			log.Println(t.LastID())
-			s, c = t.Subscribe(t.LastID() - 1)
+			s, c = t.Subscribe(t.LastID())
 		})
 
 		AfterEach(func() {
@@ -114,7 +160,7 @@ var _ = Describe("Logging", func() {
 			Expect(response.StatusCode).To(Equal(200))
 		})
 
-		It("Should log request and response events", func(done Done) {
+		It("Should log event", func(done Done) {
 
 			{
 				d := <-s
@@ -124,18 +170,10 @@ var _ = Describe("Logging", func() {
 				Expect(evt.RequestURI).To(Equal("/test1"))
 				Expect(evt.Time).ToNot(Equal(time.Time{}))
 				Expect(evt.UUID).ToNot(BeEmpty())
-				Expect(evt.Header).To(HaveKey("User-Agent"))
-				Expect(evt.Type).To(Equal("request"))
-			}
-			{
-				d := <-s
-				evt, err := comm.Decode(d.Data)
-				Expect(err).ToNot(HaveOccurred())
-				Expect(evt.Time).ToNot(Equal(time.Time{}))
-				Expect(evt.UUID).ToNot(BeEmpty())
-				Expect(evt.Header).To(HaveKey("Content-Type"))
-				Expect(evt.Type).To(Equal("response"))
-				Expect(string(evt.CapturedBody)).To(Equal("test"))
+				Expect(evt.RequestHeader).To(HaveKey("User-Agent"))
+				Expect(evt.ResponseHeader).To(HaveKey("Content-Type"))
+				Expect(string(evt.CapturedResponseBody)).To(Equal("test"))
+				Expect(string(evt.CapturedRequestBody)).To(Equal(""))
 			}
 
 			close(done)

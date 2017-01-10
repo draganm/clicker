@@ -19,38 +19,30 @@ func Proxy(bnd, remote, clickerServer string) error {
 	}
 
 	return bouncer.Proxy(bnd, remote, negroni.HandlerFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
+
+		// defer func() {
+		// 	if r := recover(); r != nil {
+		// 		fmt.Println("Recovered in f", r)
+		// 	}
+		// }()
+
 		id := uuid.NewV4().String()
-		{
-			evt := comm.Event{
-				Type:         "request",
-				Time:         time.Now(),
-				UUID:         id,
-				Header:       r.Header,
-				Method:       r.Method,
-				RequestURI:   r.RequestURI,
-				CapturedBody: []byte{},
-			}
 
-			data, err := evt.Encode()
-			if err != nil {
-				log.Println(err)
-
-			} else {
-				c.Write(data)
-			}
-		}
 		ww := newWriterWrapper(w, 1024)
+		readerWrapper := newBodyReaderWrapper(r.Body, 1024)
+		r.Body = readerWrapper
 		next.ServeHTTP(ww, r)
 		{
 			evt := comm.Event{
-				Type:   "response",
-				Time:   time.Now(),
-				UUID:   id,
-				Header: w.Header(),
-				// Method:       r.Method,
-				// RequestURI:   r.RequestURI,
+				Time:           time.Now(),
+				UUID:           id,
+				RequestHeader:  r.Header,
+				ResponseHeader: w.Header(),
+				Method:         r.Method,
+				RequestURI:     r.RequestURI,
 
-				CapturedBody: ww.capturedData(),
+				CapturedResponseBody: ww.capturedData(),
+				CapturedRequestBody:  readerWrapper.capturedData(),
 			}
 
 			data, err := evt.Encode()

@@ -9,13 +9,15 @@ import (
 
 // Event represents HTTP request
 type Event struct {
-	Type         string
-	UUID         string
-	Time         time.Time
-	RequestURI   string
-	Header       http.Header
-	CapturedBody []byte
-	Method       string
+	UUID                 string
+	Time                 time.Time
+	RequestURI           string
+	RequestHeader        http.Header
+	ResponseHeader       http.Header
+	CapturedRequestBody  []byte
+	CapturedResponseBody []byte
+	Method               string
+	// StatusCode           string
 }
 
 // Encode encodes event to bytes
