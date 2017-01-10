@@ -6,6 +6,7 @@ import (
 )
 
 type writerWrapper struct {
+	http.Hijacker
 	http.ResponseWriter
 	capturedBuffer []byte
 	captured       int
@@ -16,6 +17,7 @@ type writerWrapper struct {
 
 func newWriterWrapper(w http.ResponseWriter, captureSize int) *writerWrapper {
 	return &writerWrapper{
+		Hijacker:       w.(http.Hijacker),
 		ResponseWriter: w,
 		capturedBuffer: make([]byte, captureSize),
 		statusCode:     http.StatusOK,
