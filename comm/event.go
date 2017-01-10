@@ -16,6 +16,8 @@ type Event struct {
 	ResponseHeader       http.Header
 	CapturedRequestBody  []byte
 	CapturedResponseBody []byte
+	BytesRead            int
+	BytesWritten         int
 	Method               string
 	StatusCode           int
 }

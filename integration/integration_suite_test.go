@@ -131,6 +131,9 @@ var _ = Describe("Logging", func() {
 				Expect(string(evt.CapturedResponseBody)).To(Equal("test"))
 				Expect(string(evt.CapturedRequestBody)).To(Equal("testRequest"))
 				Expect(evt.StatusCode).To(Equal(200))
+				Expect(evt.BytesRead).To(Equal(11))
+				Expect(evt.BytesWritten).To(Equal(4))
+
 			}
 
 			close(done)
@@ -176,6 +179,8 @@ var _ = Describe("Logging", func() {
 				Expect(string(evt.CapturedResponseBody)).To(Equal("test"))
 				Expect(string(evt.CapturedRequestBody)).To(Equal(""))
 				Expect(evt.StatusCode).To(Equal(200))
+				Expect(evt.BytesRead).To(Equal(0))
+				Expect(evt.BytesWritten).To(Equal(4))
 			}
 
 			close(done)

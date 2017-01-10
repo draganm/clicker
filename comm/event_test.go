@@ -11,13 +11,12 @@ import (
 
 func TestRequestEncodeDecode(t *testing.T) {
 	req := comm.Event{
-		Time:         time.Now(),
-		Type:         "request",
-		UUID:         "1234",
-		Method:       "GET",
-		RequestURI:   "/index.html",
-		Header:       http.Header{},
-		CapturedBody: []byte("TEST"),
+		Time:                time.Now(),
+		UUID:                "1234",
+		Method:              "GET",
+		RequestURI:          "/index.html",
+		RequestHeader:       http.Header{},
+		CapturedRequestBody: []byte("TEST"),
 	}
 
 	data, err := req.Encode()

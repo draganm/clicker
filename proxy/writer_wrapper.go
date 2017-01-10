@@ -5,30 +5,31 @@ import "net/http"
 type writerWrapper struct {
 	http.ResponseWriter
 	capturedBuffer []byte
-	captureSize    int
 	captured       int
 	statusCode     int
+	bytesWritten   int
 }
 
 func newWriterWrapper(w http.ResponseWriter, captureSize int) *writerWrapper {
 	return &writerWrapper{
 		ResponseWriter: w,
-		captureSize:    captureSize,
 		capturedBuffer: make([]byte, captureSize),
 		statusCode:     http.StatusOK,
 	}
 }
 
 func (w *writerWrapper) Write(data []byte) (int, error) {
-	if w.captured < w.captureSize {
+
+	if w.captured < len(w.capturedBuffer) {
 		toCapture := len(data)
-		canCapture := w.captureSize - w.captured
+		canCapture := len(w.capturedBuffer) - w.captured
 		if toCapture > canCapture {
 			toCapture = canCapture
 		}
 		copy(w.capturedBuffer[w.captured:], data[:toCapture])
 		w.captured += toCapture
 	}
+	w.bytesWritten += len(data)
 	return w.ResponseWriter.Write(data)
 }
 

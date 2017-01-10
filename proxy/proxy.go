@@ -43,6 +43,8 @@ func Proxy(bnd, remote, clickerServer string) error {
 				StatusCode:           ww.statusCode,
 				CapturedResponseBody: ww.capturedData(),
 				CapturedRequestBody:  readerWrapper.capturedData(),
+				BytesRead:            readerWrapper.bytesRead,
+				BytesWritten:         ww.bytesWritten,
 			}
 
 			data, err := evt.Encode()

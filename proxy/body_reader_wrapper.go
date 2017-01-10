@@ -1,14 +1,12 @@
 package proxy
 
-import (
-	"io"
-	"log"
-)
+import "io"
 
 type bodyReaderWrapper struct {
 	io.ReadCloser
 	captured       []byte
 	capturedLength int
+	bytesRead      int
 }
 
 func newBodyReaderWrapper(bodyReader io.ReadCloser, captureSize int) *bodyReaderWrapper {
@@ -30,7 +28,7 @@ func (r *bodyReaderWrapper) Read(dest []byte) (int, error) {
 		copy(r.captured[r.capturedLength:], dest[:toCapture])
 		r.capturedLength += toCapture
 	}
-	log.Println(n, err)
+	r.bytesRead += n
 	return n, err
 }
 
