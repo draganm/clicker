@@ -130,6 +130,7 @@ var _ = Describe("Logging", func() {
 				Expect(evt.ResponseHeader).To(HaveKey("Content-Type"))
 				Expect(string(evt.CapturedResponseBody)).To(Equal("test"))
 				Expect(string(evt.CapturedRequestBody)).To(Equal("testRequest"))
+				Expect(evt.StatusCode).To(Equal(200))
 			}
 
 			close(done)
@@ -174,6 +175,7 @@ var _ = Describe("Logging", func() {
 				Expect(evt.ResponseHeader).To(HaveKey("Content-Type"))
 				Expect(string(evt.CapturedResponseBody)).To(Equal("test"))
 				Expect(string(evt.CapturedRequestBody)).To(Equal(""))
+				Expect(evt.StatusCode).To(Equal(200))
 			}
 
 			close(done)

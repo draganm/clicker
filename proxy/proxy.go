@@ -34,13 +34,13 @@ func Proxy(bnd, remote, clickerServer string) error {
 		next.ServeHTTP(ww, r)
 		{
 			evt := comm.Event{
-				Time:           time.Now(),
-				UUID:           id,
-				RequestHeader:  r.Header,
-				ResponseHeader: w.Header(),
-				Method:         r.Method,
-				RequestURI:     r.RequestURI,
-
+				Time:                 time.Now(),
+				UUID:                 id,
+				RequestHeader:        r.Header,
+				ResponseHeader:       w.Header(),
+				Method:               r.Method,
+				RequestURI:           r.RequestURI,
+				StatusCode:           ww.statusCode,
 				CapturedResponseBody: ww.capturedData(),
 				CapturedRequestBody:  readerWrapper.capturedData(),
 			}

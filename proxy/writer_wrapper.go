@@ -7,6 +7,7 @@ type writerWrapper struct {
 	capturedBuffer []byte
 	captureSize    int
 	captured       int
+	statusCode     int
 }
 
 func newWriterWrapper(w http.ResponseWriter, captureSize int) *writerWrapper {
@@ -14,6 +15,7 @@ func newWriterWrapper(w http.ResponseWriter, captureSize int) *writerWrapper {
 		ResponseWriter: w,
 		captureSize:    captureSize,
 		capturedBuffer: make([]byte, captureSize),
+		statusCode:     http.StatusOK,
 	}
 }
 
@@ -32,4 +34,9 @@ func (w *writerWrapper) Write(data []byte) (int, error) {
 
 func (w *writerWrapper) capturedData() []byte {
 	return w.capturedBuffer[:w.captured]
+}
+
+func (w *writerWrapper) WriteHeader(statusCode int) {
+	w.statusCode = statusCode
+	w.ResponseWriter.WriteHeader(statusCode)
 }

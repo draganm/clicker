@@ -17,7 +17,7 @@ type Event struct {
 	CapturedRequestBody  []byte
 	CapturedResponseBody []byte
 	Method               string
-	// StatusCode           string
+	StatusCode           int
 }
 
 // Encode encodes event to bytes
