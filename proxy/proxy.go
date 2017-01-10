@@ -39,7 +39,8 @@ func Proxy(bnd, remote, clickerServer string) error {
 				c.Write(data)
 			}
 		}
-		next.ServeHTTP(w, r)
+		ww := newWriterWrapper(w, 1024)
+		next.ServeHTTP(ww, r)
 		{
 			evt := comm.Event{
 				Type:   "response",
@@ -48,7 +49,8 @@ func Proxy(bnd, remote, clickerServer string) error {
 				Header: w.Header(),
 				// Method:       r.Method,
 				// RequestURI:   r.RequestURI,
-				CapturedBody: []byte{},
+
+				CapturedBody: ww.capturedData(),
 			}
 
 			data, err := evt.Encode()

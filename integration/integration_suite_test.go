@@ -135,6 +135,7 @@ var _ = Describe("Logging", func() {
 				Expect(evt.UUID).ToNot(BeEmpty())
 				Expect(evt.Header).To(HaveKey("Content-Type"))
 				Expect(evt.Type).To(Equal("response"))
+				Expect(string(evt.CapturedBody)).To(Equal("test"))
 			}
 
 			close(done)
