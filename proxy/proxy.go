@@ -20,12 +20,6 @@ func Proxy(bnd, remote, clickerServer string) error {
 
 	return bouncer.Proxy(bnd, remote, negroni.HandlerFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
-		// defer func() {
-		// 	if r := recover(); r != nil {
-		// 		fmt.Println("Recovered in f", r)
-		// 	}
-		// }()
-
 		id := uuid.NewV4().String()
 
 		ww := newWriterWrapper(w, 1024)
@@ -45,6 +39,8 @@ func Proxy(bnd, remote, clickerServer string) error {
 				CapturedRequestBody:  readerWrapper.capturedData(),
 				BytesRead:            readerWrapper.bytesRead,
 				BytesWritten:         ww.bytesWritten,
+				LastByteReadAt:       readerWrapper.lastReadAt,
+				LastByteWrittenAt:    ww.lastWrittenAt,
 			}
 
 			data, err := evt.Encode()

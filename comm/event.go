@@ -20,6 +20,8 @@ type Event struct {
 	BytesWritten         int
 	Method               string
 	StatusCode           int
+	LastByteReadAt       time.Time
+	LastByteWrittenAt    time.Time
 }
 
 // Encode encodes event to bytes

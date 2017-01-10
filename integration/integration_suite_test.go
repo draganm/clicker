@@ -133,6 +133,8 @@ var _ = Describe("Logging", func() {
 				Expect(evt.StatusCode).To(Equal(200))
 				Expect(evt.BytesRead).To(Equal(11))
 				Expect(evt.BytesWritten).To(Equal(4))
+				Expect(evt.LastByteReadAt).ToNot(Equal(time.Time{}))
+				Expect(evt.LastByteWrittenAt).ToNot(Equal(time.Time{}))
 
 			}
 
@@ -181,6 +183,9 @@ var _ = Describe("Logging", func() {
 				Expect(evt.StatusCode).To(Equal(200))
 				Expect(evt.BytesRead).To(Equal(0))
 				Expect(evt.BytesWritten).To(Equal(4))
+				Expect(evt.LastByteReadAt).ToNot(Equal(time.Time{}))
+				Expect(evt.LastByteWrittenAt).ToNot(Equal(time.Time{}))
+
 			}
 
 			close(done)

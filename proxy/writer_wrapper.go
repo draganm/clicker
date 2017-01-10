@@ -1,6 +1,9 @@
 package proxy
 
-import "net/http"
+import (
+	"net/http"
+	"time"
+)
 
 type writerWrapper struct {
 	http.ResponseWriter
@@ -8,6 +11,7 @@ type writerWrapper struct {
 	captured       int
 	statusCode     int
 	bytesWritten   int
+	lastWrittenAt  time.Time
 }
 
 func newWriterWrapper(w http.ResponseWriter, captureSize int) *writerWrapper {
@@ -29,8 +33,10 @@ func (w *writerWrapper) Write(data []byte) (int, error) {
 		copy(w.capturedBuffer[w.captured:], data[:toCapture])
 		w.captured += toCapture
 	}
-	w.bytesWritten += len(data)
-	return w.ResponseWriter.Write(data)
+	n, err := w.ResponseWriter.Write(data)
+	w.bytesWritten += n
+	w.lastWrittenAt = time.Now()
+	return n, err
 }
 
 func (w *writerWrapper) capturedData() []byte {

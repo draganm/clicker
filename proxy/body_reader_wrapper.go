@@ -1,12 +1,16 @@
 package proxy
 
-import "io"
+import (
+	"io"
+	"time"
+)
 
 type bodyReaderWrapper struct {
 	io.ReadCloser
 	captured       []byte
 	capturedLength int
 	bytesRead      int
+	lastReadAt     time.Time
 }
 
 func newBodyReaderWrapper(bodyReader io.ReadCloser, captureSize int) *bodyReaderWrapper {
@@ -20,6 +24,7 @@ func newBodyReaderWrapper(bodyReader io.ReadCloser, captureSize int) *bodyReader
 func (r *bodyReaderWrapper) Read(dest []byte) (int, error) {
 
 	n, err := r.ReadCloser.Read(dest)
+	r.lastReadAt = time.Now()
 	toCapture := len(r.captured) - r.capturedLength
 	if toCapture > 0 {
 		if n < toCapture {
@@ -29,6 +34,7 @@ func (r *bodyReaderWrapper) Read(dest []byte) (int, error) {
 		r.capturedLength += toCapture
 	}
 	r.bytesRead += n
+
 	return n, err
 }
 
