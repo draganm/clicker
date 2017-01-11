@@ -6,7 +6,10 @@ import (
 	"github.com/draganm/zathras/topic"
 )
 
+var Topic *topic.Topic
+
 func Serve(addr string, t *topic.Topic) error {
+	Topic = t
 	udpAddr, err := net.ResolveUDPAddr("udp", addr)
 	if err != nil {
 		return err

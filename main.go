@@ -5,6 +5,7 @@ import (
 
 	"github.com/draganm/clicker/proxy"
 	"github.com/draganm/clicker/server"
+	"github.com/draganm/clicker/ui"
 	"github.com/draganm/zathras/topic"
 
 	"gopkg.in/urfave/cli.v2"
@@ -38,6 +39,9 @@ func main() {
 					if err != nil {
 						return err
 					}
+
+					go ui.Serve(c.String("web-bind"))
+
 					return server.Serve(c.String("server-bind"), topic)
 				},
 			},
