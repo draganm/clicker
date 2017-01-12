@@ -17,8 +17,14 @@ var indexUI = reactor.MustParseDisplayModel(`
     <dd id="bytesReceived">...</dd>
     <dt>Bytes Sent</dt>
     <dd id="bytesSent">...</dd>
-    <dt>Errors</dt>
-    <dd id="errors">...</dd>
+    <dt>Successes</dt>
+    <dd id="successes">...</dd>
+    <dt>Redirects</dt>
+    <dd id="redirects">...</dd>
+    <dt>ClientErrors</dt>
+    <dd id="clientErrors">...</dd>
+    <dt>ServerErrors</dt>
+    <dd id="serverErrors">...</dd>
   </dl>
 `)
 
@@ -55,7 +61,10 @@ func (i *Index) render() {
 	ui.SetElementText("requestCount", fmt.Sprintf("%d", i.current.Requests))
 	ui.SetElementText("bytesReceived", fmt.Sprintf("%d", i.current.BytesReceived))
 	ui.SetElementText("bytesSent", fmt.Sprintf("%d", i.current.BytesSent))
-	ui.SetElementText("errors", fmt.Sprintf("%d", i.current.Errors))
+	ui.SetElementText("successes", fmt.Sprintf("%d", i.current.Successes))
+	ui.SetElementText("redirects", fmt.Sprintf("%d", i.current.Redirects))
+	ui.SetElementText("clientErrors", fmt.Sprintf("%d", i.current.ClientErrors))
+	ui.SetElementText("serverErrors", fmt.Sprintf("%d", i.current.ServerErrors))
 	// bytesReceived
 	i.ctx.UpdateScreen(&reactor.DisplayUpdate{
 		Model: WithNavigation(ui),

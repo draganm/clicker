@@ -16,7 +16,10 @@ type WebStatsBucket struct {
 	Requests      int
 	BytesReceived int
 	BytesSent     int
-	Errors        int
+	Successes     int
+	Redirects     int
+	ClientErrors  int
+	ServerErrors  int
 }
 
 type SoFar struct {
@@ -74,8 +77,17 @@ func (s *SoFar) webEvent(evt comm.Event) {
 	s.stats.BytesReceived += evt.BytesRead
 	s.stats.BytesSent += evt.BytesWritten
 	s.stats.Requests++
-	if evt.StatusCode >= 400 {
-		s.stats.Errors++
+	if evt.StatusCode >= 200 && evt.StatusCode < 300 {
+		s.stats.Successes++
+	}
+	if evt.StatusCode >= 300 && evt.StatusCode < 400 {
+		s.stats.Redirects++
+	}
+	if evt.StatusCode >= 400 && evt.StatusCode < 500 {
+		s.stats.ClientErrors++
+	}
+	if evt.StatusCode >= 500 {
+		s.stats.ServerErrors++
 	}
 	s.Emit("update", *s.stats)
 }
