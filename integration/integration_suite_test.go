@@ -2,7 +2,6 @@ package integration_test
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -11,6 +10,7 @@ import (
 	"github.com/draganm/clicker/comm"
 	"github.com/draganm/clicker/proxy"
 	"github.com/draganm/clicker/server"
+	"github.com/draganm/clicker/ui"
 	"github.com/draganm/zathras/topic"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -34,7 +34,6 @@ func startHTTPServer() {
 		if err == nil {
 			break
 		}
-		log.Println(err)
 		time.Sleep(time.Millisecond * 10)
 	}
 
@@ -51,6 +50,25 @@ func startClickerProxy() {
 
 	for {
 		_, err := http.Get("http://localhost:8080")
+		if err == nil {
+			break
+		}
+		time.Sleep(time.Millisecond * 10)
+	}
+
+}
+
+func startUI() {
+
+	go func() {
+		err := ui.Serve(":8082")
+		if err != nil {
+			panic(err)
+		}
+	}()
+
+	for {
+		_, err := http.Get("http://localhost:8082")
 		if err == nil {
 			break
 		}
@@ -86,6 +104,7 @@ var _ = BeforeSuite(func(done Done) {
 	startHTTPServer()
 	startClickerProxy()
 	startClickerServer()
+	startUI()
 	close(done)
 }, 3.0)
 

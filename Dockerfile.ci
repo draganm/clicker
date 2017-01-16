@@ -1,0 +1,6 @@
+FROM golang:1.7.4
+COPY . /go/src/github.com/draganm/clicker
+WORKDIR /go/src/github.com/draganm/clicker
+RUN go install && go get github.com/onsi/ginkgo/ginkgo
+# ENTRYPOINT ["/bin/bash","-c"]
+CMD ["ginkgo", "-r"]
