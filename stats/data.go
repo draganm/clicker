@@ -32,3 +32,23 @@ func (d Data) Max() float64 {
 	}
 	return min
 }
+
+// Normalize returns data in the rage [0.0, 1.0].
+func (d Data) Normalize() Data {
+
+	normalized := make(Data, len(d))
+
+	min := d.Min()
+	max := d.Max()
+
+	offset := -min
+	scale := 0.0
+	if min != max {
+		scale = 1.0 / (max - min)
+	}
+
+	for i, v := range d {
+		normalized[i] = (v + offset) * scale
+	}
+	return normalized
+}
