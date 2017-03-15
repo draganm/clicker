@@ -1,6 +1,11 @@
 package graph
 
-import "github.com/draganm/clicker/stats"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/draganm/clicker/stats"
+)
 
 type Point struct {
 	X float64
@@ -9,11 +14,13 @@ type Point struct {
 
 type Line []Point
 
-// type Graph struct {
-// 	Width  float64
-// 	Height float64
-// 	Line
-// }
+func (l Line) String() string {
+	parts := make([]string, len(l))
+	for i, p := range l {
+		parts[i] = fmt.Sprintf("%.2f,%.2f", p.X, p.Y)
+	}
+	return strings.Join(parts, " ")
+}
 
 func ToLine(d stats.Data, width, height float64) Line {
 	n := d.Normalize()
